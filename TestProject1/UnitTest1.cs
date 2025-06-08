@@ -1,7 +1,6 @@
-п»їusing Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+using ClassLibrary2;
 
-namespace UnitTestProject1
+namespace TestProject1
 {
     [TestClass]
     public class IntegralTests
@@ -9,7 +8,7 @@ namespace UnitTestProject1
         [TestMethod]
         public void IdentityTest()
         {
-            //РЎРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р° РґР»СЏ РіРµРЅРµСЂР°С†РёРё С‡РёСЃРµР»
+            //Создание объекта для генерации чисел
             Random rnd = new Random(1111);
 
             int n = 10000;
@@ -22,7 +21,7 @@ namespace UnitTestProject1
             for (int i = 0; i < n; i++)
             {
                 double x = rnd.NextDouble() * (b - a) + a;
-                double y = WindowsFormsApp1.Functions.IdentityFunction(x);
+                double y = Functions.IdentityFunction(x);
                 S += y;
             }
 
@@ -34,7 +33,7 @@ namespace UnitTestProject1
         [TestMethod]
         public void SquareTest()
         {
-            //РЎРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р° РґР»СЏ РіРµРЅРµСЂР°С†РёРё С‡РёСЃРµР»
+            //Создание объекта для генерации чисел
             Random rnd = new Random(1111);
 
             int n = 10000;
@@ -47,7 +46,7 @@ namespace UnitTestProject1
             for (int i = 0; i < n; i++)
             {
                 double x = rnd.NextDouble() * (b - a) + a;
-                double y = WindowsFormsApp1.Functions.SquareFunction(x);
+                double y = Functions.SquareFunction(x);
                 S += y;
             }
 
@@ -59,7 +58,7 @@ namespace UnitTestProject1
         [TestMethod]
         public void ExponentialTest()
         {
-            //РЎРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р° РґР»СЏ РіРµРЅРµСЂР°С†РёРё С‡РёСЃРµР»
+            //Создание объекта для генерации чисел
             Random rnd = new Random(1111);
 
             int n = 10000;
@@ -72,7 +71,7 @@ namespace UnitTestProject1
             for (int i = 0; i < n; i++)
             {
                 double x = rnd.NextDouble() * (b - a) + a;
-                double y = WindowsFormsApp1.Functions.ExponentialFunction(x);
+                double y = Functions.ExponentialFunction(x);
                 S += y;
             }
 
@@ -84,7 +83,7 @@ namespace UnitTestProject1
         [TestMethod]
         public void SineTest()
         {
-            //РЎРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р° РґР»СЏ РіРµРЅРµСЂР°С†РёРё С‡РёСЃРµР»
+            //Создание объекта для генерации чисел
             Random rnd = new Random(1111);
 
             int n = 10000;
@@ -97,7 +96,7 @@ namespace UnitTestProject1
             for (int i = 0; i < n; i++)
             {
                 double x = rnd.NextDouble() * (b - a) + a;
-                double y = WindowsFormsApp1.Functions.SineFunction(x);
+                double y = Functions.SineFunction(x);
                 S += y;
             }
 
@@ -109,7 +108,7 @@ namespace UnitTestProject1
         [TestMethod]
         public void CosineTest()
         {
-            //РЎРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р° РґР»СЏ РіРµРЅРµСЂР°С†РёРё С‡РёСЃРµР»
+            //Создание объекта для генерации чисел
             Random rnd = new Random(1111);
 
             int n = 10000;
@@ -122,7 +121,7 @@ namespace UnitTestProject1
             for (int i = 0; i < n; i++)
             {
                 double x = rnd.NextDouble() * (b - a) + a;
-                double y = WindowsFormsApp1.Functions.CosineFunction(x);
+                double y = Functions.CosineFunction(x);
                 S += y;
             }
 
@@ -134,7 +133,7 @@ namespace UnitTestProject1
         [TestMethod]
         public void TangentTest()
         {
-            //РЎРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р° РґР»СЏ РіРµРЅРµСЂР°С†РёРё С‡РёСЃРµР»
+            //Создание объекта для генерации чисел
             Random rnd = new Random(1111);
 
             int n = 10000;
@@ -147,7 +146,7 @@ namespace UnitTestProject1
             for (int i = 0; i < n; i++)
             {
                 double x = rnd.NextDouble() * (b - a) + a;
-                double y = WindowsFormsApp1.Functions.TangentFunction(x);
+                double y = Functions.TangentFunction(x);
                 S += y;
             }
 
