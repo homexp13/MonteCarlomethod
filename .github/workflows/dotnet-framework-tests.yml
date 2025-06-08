@@ -22,9 +22,6 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: Clean build
-      run: dotnet clean --configuration Release
-
     - name: Restore dependencies
       run: dotnet restore
 
