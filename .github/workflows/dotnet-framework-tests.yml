@@ -33,4 +33,4 @@ jobs:
 
       - name: Run MSTest tests
         run: |
-          & $env:VSTEST_PATH .\MonteCarlomethod\TestProject1\bin\Release\TestProject1.dll
+          & $env:VSTEST_PATH .\TestProject1\bin\Release\TestProject1.dll
