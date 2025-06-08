@@ -1,39 +1,52 @@
-name: .NET Framework Tests on PR
+name: .NET Framework Tests
 
 on:
   pull_request:
-    branches: [ main, develop ]  # Запускать только для этих веток
+    branches: [ main, develop ]
 
 jobs:
   test:
-    runs-on: windows-latest  # .NET Framework требует Windows
+    runs-on: windows-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      
+    - name: Add NuGet cache
+      uses: actions/cache@v3
+      with:
+        path: packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.config') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
 
     - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1  # Установка инструментов сборки
+      uses: microsoft/setup-msbuild@v1
 
-    - name: Install Visual Studio Test Agent
+    - name: Install NuGet
+      uses: nuget/setup-nuget@v1
+      with:
+        version: '6.6.1'  # Последняя стабильная версия
+
+    - name: Restore NuGet packages
+      run: nuget restore WindowsFormsApp1.sln
+
+    - name: Install Test Agent
       run: |
-        choco install visualstudio2022-testagent --yes --no-progress
-        choco install visualstudio2022-workload-webbuildtools --yes --no-progress
-        
-    - name: Restore dependencies
-      run: dotnet restore
+        choco install visualstudio2022-testagent -y --no-progress
+        choco install visualstudio2022-workload-webbuildtools -y --no-progress
 
     - name: Build solution
-      run: msbuild WindowsFormsApp1.sln /p:Configuration=Release
+      run: msbuild WindowsFormsApp1.sln /p:Configuration=Release /p:RestorePackages=false
 
-    - name: Run unit tests
+    - name: Run tests
       run: |
         cd UnitTestProject1/bin/Release
-        vstest.console.exe Tests.dll /logger:trx
+        vstest.console.exe UnitTestProject1.dll /logger:trx
       
     - name: Upload test results
       uses: actions/upload-artifact@v4
-      if: always()  # Загрузить результаты даже при падении тестов
+      if: always()
       with:
         name: Test-Results
-        path: Tests/bin/Release/TestResults/*.trx
+        path: UnitTestProject1/bin/Release/TestResults/*.trx
