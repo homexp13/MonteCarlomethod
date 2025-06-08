@@ -29,7 +29,7 @@ jobs:
         vstest.console.exe Tests.dll /logger:trx
       
     - name: Upload test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()  # Загрузить результаты даже при падении тестов
       with:
         name: Test-Results
