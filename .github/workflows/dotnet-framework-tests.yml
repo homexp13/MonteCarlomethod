@@ -22,6 +22,9 @@ jobs:
 
     - name: Build solution
       run: msbuild WindowsFormsApp1.sln /p:Configuration=Release
+      
+    - name: Restore dependencies
+      run: dotnet restore
 
     - name: Run unit tests
       run: |
