@@ -27,8 +27,9 @@ jobs:
       - name: Find vstest.console.exe
         id: vswhere
         run: |
-          $vstestPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -requires Microsoft.Component.MSBuild -find **\vstest.console.exe
-          echo "VSTEST_PATH=$vstestPath" >> $env:GITHUB_ENV
+          $vstestPaths = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -requires Microsoft.Component.MSBuild -find **\vstest.console.exe
+          $firstPath = $vstestPaths -split "`r`n" | Select-Object -First 1
+          echo "VSTEST_PATH=$firstPath" >> $env:GITHUB_ENV
 
       - name: Run MSTest tests
         run: |
