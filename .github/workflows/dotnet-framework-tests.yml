@@ -7,46 +7,43 @@ on:
 jobs:
   test:
     runs-on: windows-latest
+    timeout-minutes: 20
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Add NuGet cache
-      uses: actions/cache@v3
-      with:
-        path: packages
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.config') }}
-        restore-keys: |
-          ${{ runner.os }}-nuget-
-
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v1
 
-    - name: Install NuGet
-      uses: nuget/setup-nuget@v1
-      with:
-        version: '6.6.1'  # Последняя стабильная версия
-
-    - name: Restore NuGet packages
-      run: nuget restore WindowsFormsApp1.sln
-
-    - name: Install Test Agent
+    - name: Install Test Components
       run: |
         choco install visualstudio2022-testagent -y --no-progress
         choco install visualstudio2022-workload-webbuildtools -y --no-progress
 
+    - name: Restore NuGet packages
+      run: nuget restore WindowsFormsApp1.sln
+
     - name: Build solution
-      run: msbuild WindowsFormsApp1.sln /p:Configuration=Debug /p:RestorePackages=false
+      run: msbuild WindowsFormsApp1.sln /p:Configuration=Release
+
+    - name: Find VSTest path
+      id: find_vstest
+      shell: pwsh
+      run: |
+        $vstestPath = (Get-ChildItem -Path "C:\Program Files (x86)\Microsoft Visual Studio" -Recurse -Filter "vstest.console.exe" | Select-Object -First 1).FullName
+        echo "::set-output name=vstest_path::$vstestPath"
+        echo "Found VSTest at: $vstestPath"
 
     - name: Run tests
+      shell: pwsh
       run: |
-        cd UnitTestProject1/bin/Debug
-        vstest.console.exe UnitTestProject1.dll /logger:trx
+        $vstest = "${{ steps.find_vstest.outputs.vstest_path }}"
+        & "$vstest" "UnitTestProject1\bin\Release\UnitTestProject1.dll" /logger:trx
       
     - name: Upload test results
       uses: actions/upload-artifact@v4
       if: always()
       with:
         name: Test-Results
-        path: UnitTestProject1/bin/Debug/TestResults/*.trx
+        path: UnitTestProject1/bin/Release/TestResults/*.trx
