@@ -33,4 +33,4 @@ jobs:
 
       - name: Run MSTest tests
         run: |
-          & $env:VSTEST_PATH TestProject1\bin\Release\net8.0\TestProject1.dll
+          & $env:VSTEST_PATH UnitTestProject1\bin\Release\net8.0\UnitTestProject1.dll
