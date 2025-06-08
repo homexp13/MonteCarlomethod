@@ -1,41 +1,41 @@
-name: .NET Tests on PR
+name: .NET 8.0 CI
 
 on:
   pull_request:
-    branches: [ main, develop ]
+    branches: [ "main", "master" ]
+
+env:
+  DOTNET_VERSION: '8.0.x'
 
 jobs:
-  test:
-    runs-on: windows-latest  # или ubuntu-latest для кроссплатформенных тестов
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Setup .NET 8.x
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET SDK
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 8.0.x
-
-    - name: Disable workload updates
-      run: dotnet workload update --disable-parallel
+        dotnet-version: ${{ env.DOTNET_VERSION }}
 
     - name: Restore dependencies
       run: dotnet restore
 
-    - name: Build solution
+    - name: Build
       run: dotnet build --configuration Release --no-restore
 
-    - name: Run tests with results
-      run: |
-        dotnet test --configuration Release --no-build --logger "trx;LogFileName=test-results.trx" --results-directory TestResults
-        
-        # Проверяем создание файла результатов (для отладки)
-        ls -R TestResults
+    - name: Run tests
+  run: dotnet test ./TestProject1/TestProject1.csproj --configuration Release --no-build --verbosity normal
 
-    - name: Upload test results
-      uses: actions/upload-artifact@v4  # Важно использовать v4 вместо v3
-      if: always()
+    - name: Publish artifacts
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      run: dotnet publish --configuration Release --output ./publish
+      
+    - name: Upload artifact
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      uses: actions/upload-artifact@v3
       with:
-        name: Test-Results
-        path: TestResults/*.trx
+        name: myapp
+        path: ./publish
