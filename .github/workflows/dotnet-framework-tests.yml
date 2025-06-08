@@ -19,12 +19,12 @@ jobs:
       run: |
         choco install visualstudio2022-testagent --yes --no-progress
         choco install visualstudio2022-workload-webbuildtools --yes --no-progress
+        
+    - name: Restore dependencies
+      run: dotnet restore
 
     - name: Build solution
       run: msbuild WindowsFormsApp1.sln /p:Configuration=Release
-      
-    - name: Restore dependencies
-      run: dotnet restore
 
     - name: Run unit tests
       run: |
