@@ -1,0 +1,36 @@
+name: .NET Framework Tests on PR
+
+on:
+  pull_request:
+    branches: [ main, develop ]  # Запускать только для этих веток
+
+jobs:
+  test:
+    runs-on: windows-latest  # .NET Framework требует Windows
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1  # Установка инструментов сборки
+
+    - name: Install Visual Studio Test Agent
+      run: |
+        choco install visualstudio2022-testagent --yes --no-progress
+        choco install visualstudio2022-workload-webbuildtools --yes --no-progress
+
+    - name: Build solution
+      run: msbuild WindowsFormsApp1.sln /p:Configuration=Release
+
+    - name: Run unit tests
+      run: |
+        cd UnitTestProject1/bin/Release
+        vstest.console.exe Tests.dll /logger:trx
+      
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()  # Загрузить результаты даже при падении тестов
+      with:
+        name: Test-Results
+        path: Tests/bin/Release/TestResults/*.trx

@@ -37,8 +37,6 @@ namespace WindowsFormsApp1
             double a = Convert.ToDouble(textBox3.Text);
             double b = Convert.ToDouble(textBox4.Text);
            
-            
-
             double S = 0;
             double h = (double)(b - a) / (double)n;
 
@@ -73,17 +71,17 @@ namespace WindowsFormsApp1
         {
             switch (comboBox1.SelectedIndex)
             {
-                case 0: return x;
+                case 0: return Functions.IdentityFunction(x);
 
-                case 1: return x * x;
+                case 1: return Functions.SquareFunction(x);
 
-                case 2: return Math.Pow(Math.E, x);
+                case 2: return Functions.ExponentialFunction(x);
 
-                case 3: return Math.Sin(x);
+                case 3: return Functions.SineFunction(x);
 
-                case 4: return Math.Cos(x);
+                case 4: return Functions.CosineFunction(x);
 
-                case 5: return Math.Tan(x);
+                case 5: return Functions.TangentFunction(x);
 
                 default: return 0;
             }
