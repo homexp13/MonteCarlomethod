@@ -11,51 +11,58 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
-    - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1
 
-    - name: Install Test Components
+    - name: Setup build tools
       run: |
+        # Установка необходимых компонентов
+        choco install visualstudio2022-workload-manageddesktopbuildtools -y --no-progress
         choco install visualstudio2022-testagent -y --no-progress
-        choco install visualstudio2022-workload-webbuildtools -y --no-progress
+        choco install nuget.commandline -y --no-progress
 
     - name: Restore NuGet packages
       run: nuget restore WindowsFormsApp1.sln
 
     - name: Build solution
-      run: msbuild WindowsFormsApp1.sln /p:Configuration=Debug
+      run: msbuild WindowsFormsApp1.sln /p:Configuration=Debug /p:Platform="Any CPU" /p:RestorePackages=false
 
-    - name: Find and Run Tests
+    - name: Create TestResults directory
       shell: pwsh
       run: |
-        # 1. Находим vstest.console.exe
+        $testResultsPath = "UnitTestProject1\bin\Debug\TestResults"
+        if (-not (Test-Path $testResultsPath)) {
+            New-Item -ItemType Directory -Path $testResultsPath -Force | Out-Null
+        }
+
+    - name: Run tests with full path
+      shell: pwsh
+      run: |
+        # Находим полный путь к vstest.console.exe
         $vstestPath = (Get-ChildItem -Path "${env:ProgramFiles(x86)}\Microsoft Visual Studio" -Recurse -Filter "vstest.console.exe" | Select-Object -First 1).FullName
         
         if (-not $vstestPath) {
             throw "vstest.console.exe not found!"
         }
         
-        Write-Host "Found vstest at: $vstestPath"
+        Write-Host "Using vstest at: $vstestPath"
         
-        # 2. Проверяем существование тестовой DLL
-        $testDll = "UnitTestProject1\bin\Debug\UnitTestProject1.dll"
-        if (-not (Test-Path $testDll)) {
-            throw "Test DLL not found at: $testDll"
+        # Запускаем тесты с явным указанием директории результатов
+        & "$vstestPath" "UnitTestProject1\bin\Debug\UnitTestProject1.dll" `
+          /logger:"trx;LogFileName=TestResults\UnitTests.trx" `
+          /TestAdapterPath:"UnitTestProject1\bin\Debug"
+
+    - name: Verify test results
+      shell: pwsh
+      run: |
+        $trxPath = "UnitTestProject1\bin\Debug\TestResults\UnitTests.trx"
+        if (-not (Test-Path $trxPath)) {
+            Get-ChildItem -Path "UnitTestProject1\bin\Debug" -Recurse | Format-Table -AutoSize
+            throw "Test results file not found at $trxPath"
         }
-        
-        # 3. Запускаем тесты
-        & "$vstestPath" "$testDll" /logger:trx
-        
-        # 4. Проверяем существование результатов
-        $trxFiles = Get-ChildItem "UnitTestProject1\bin\Debug\TestResults\*.trx"
-        if (-not $trxFiles) {
-            throw "No test results files found!"
-        }
-      
+        Write-Host "Test results found at: $trxPath"
+
     - name: Upload test results
       uses: actions/upload-artifact@v4
       if: always()
       with:
         name: Test-Results
-        path: UnitTestProject1/bin/Debug/TestResults/*.trx
+        path: UnitTestProject1/bin/Debug/TestResults/UnitTests.trx
