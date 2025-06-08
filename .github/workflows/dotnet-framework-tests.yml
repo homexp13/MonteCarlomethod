@@ -28,6 +28,9 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
 
+    - name: Build solution
+      run: dotnet build --configuration Release --no-restore
+
     # Шаг для проверки структуры папок
     - name: Verify build output
       run: |
