@@ -37,11 +37,11 @@ jobs:
         choco install visualstudio2022-workload-webbuildtools -y --no-progress
 
     - name: Build solution
-      run: msbuild WindowsFormsApp1.sln /p:Configuration=Release /p:RestorePackages=false
+      run: msbuild WindowsFormsApp1.sln /p:Configuration=Debug /p:RestorePackages=false
 
     - name: Run tests
       run: |
-        cd UnitTestProject1/bin/Release
+        cd UnitTestProject1/bin/Debug
         vstest.console.exe UnitTestProject1.dll /logger:trx
       
     - name: Upload test results
@@ -49,4 +49,4 @@ jobs:
       if: always()
       with:
         name: Test-Results
-        path: UnitTestProject1/bin/Release/TestResults/*.trx
+        path: UnitTestProject1/bin/Debug/TestResults/*.trx
