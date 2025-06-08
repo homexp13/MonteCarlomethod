@@ -1,6 +1,8 @@
 name: .NET 8.0 CI
 
 on:
+  push:
+    branches: [ "main", "master" ]
   pull_request:
     branches: [ "main", "master" ]
 
@@ -23,16 +25,20 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
 
+    # Альтернативный способ запуска тестов
     - name: Run tests
-      run: dotnet test ./TestProject1/TestProject1.csproj --configuration Release --no-build --verbosity normal
-
-    - name: Publish artifacts
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-      run: dotnet publish --configuration Release --output ./publish
+      run: |
+        $testDll = Get-ChildItem -Path . -Recurse -Filter "TestProject1.dll" | Where-Object { $_.FullName -like "*bin\Release\net8.0*" } | Select-Object -First 1
+        if ($null -eq $testDll) {
+            Write-Error "TestProject1.dll not found!"
+            exit 1
+        }
+        Write-Host "Found test DLL at: $($testDll.FullName)"
+        dotnet vstest $testDll.FullName --logger:"console;verbosity=normal"
       
-    - name: Upload artifact
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    - name: Upload test results
       uses: actions/upload-artifact@v4
+      if: always()
       with:
-        name: myapp
-        path: ./publish
+        name: test-results
+        path: TestResults/
