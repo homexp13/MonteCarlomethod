@@ -27,7 +27,7 @@ jobs:
       run: dotnet build --configuration Release --no-restore
 
     - name: Run tests
-  run: dotnet test ./TestProject1/TestProject1.csproj --configuration Release --no-build --verbosity normal
+      run: dotnet test ./TestProject1/TestProject1.csproj --configuration Release --no-build --verbosity normal
 
     - name: Publish artifacts
       if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
