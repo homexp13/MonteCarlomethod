@@ -39,6 +39,14 @@ jobs:
     - name: Build solution
       run: msbuild WindowsFormsApp1.sln /p:Configuration=Debug /p:RestorePackages=false
 
+    - name: Find VSTest path
+      id: find_vstest
+      shell: pwsh
+      run: |
+        $vstestPath = (Get-ChildItem -Path "C:\Program Files (x86)\Microsoft Visual Studio" -Recurse -Filter "vstest.console.exe" | Select-Object -First 1).FullName
+        echo "::set-output name=vstest_path::$vstestPath"
+        echo "Found VSTest at: $vstestPath"
+
     - name: Run tests
       run: |
         cd UnitTestProject1/bin/Debug
