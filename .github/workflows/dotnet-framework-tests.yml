@@ -1,0 +1,36 @@
+name: .NET Framework Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild path
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore NuGet packages
+        run: nuget restore WindowsFormsApp1.sln
+
+      - name: Build solution
+        run: msbuild WindowsFormsApp1.sln /p:Configuration=Release
+
+      - name: Find vstest.console.exe
+        id: vswhere
+        run: |
+          $vstestPaths = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -requires Microsoft.Component.MSBuild -find **\vstest.console.exe
+          $firstPath = $vstestPaths -split "`r`n" | Select-Object -First 1
+          echo "VSTEST_PATH=$firstPath" >> $env:GITHUB_ENV
+
+      - name: Run MSTest tests
+        run: |
+          & $env:VSTEST_PATH UnitTestProject1\bin\Release\UnitTestProject1.dll
